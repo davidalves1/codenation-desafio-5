@@ -1,5 +1,6 @@
 import React from 'react';
 import { getContacts } from './services/api';
+import { orderBy } from './utils/list';
 
 import Topbar from './components/Topbar';
 import Filters from './components/Filters';
@@ -12,17 +13,29 @@ class App extends React.Component {
     super();
     this.state = {
       loading: false,
+      search: '',
       contacts: [],
     };
+
+    this.handleUpdateSearch = this.handleUpdateSearch.bind(this);
+    this.handleOrderContacts = this.handleOrderContacts.bind(this);
   }
 
   async handleGetContacts() {
     this.setState({ loading: true });
-
     const contacts = await getContacts();
-    console.log(contacts);
-
     this.setState({ contacts, loading: false });
+  }
+
+  handleUpdateSearch(search) {
+    this.setState({ search });
+  }
+
+  handleOrderContacts(key) {
+    const { contacts } = this.state;
+    const ordenedContacts = orderBy(contacts, key);
+
+    this.setState({ contacts: ordenedContacts });
   }
 
   componentDidMount() {
@@ -30,13 +43,17 @@ class App extends React.Component {
   }
 
   render() {
-    const { contacts } = this.state;
+    const { contacts, search } = this.state;
+
+    const filteredContacts = search
+      ? contacts.filter(contact => contact.name.toLowerCase().includes(search.toLowerCase()))
+      : contacts;
 
     return (
       <React.Fragment>
         <Topbar />
-        <Filters />
-        <Contacts contacts={contacts} />
+        <Filters updateSearch={this.handleUpdateSearch} updateOrder={this.handleOrderContacts} />
+        <Contacts contacts={filteredContacts} filter={search} />
       </React.Fragment>
     )
   }

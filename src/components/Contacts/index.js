@@ -8,10 +8,10 @@ class Contacts extends React.Component {
     const { contacts } = this.props;
 
     return (
-      <div className="container">
+      <div className="container" data-testid="contacts">
         <section className="contacts">
           <Contact />
-          { contacts.map(contact => <Contact key={contact.id} contact={contact} />) }
+          { contacts && contacts.map(contact => <Contact key={contact.id} contact={contact} />) }
         </section>
       </div>
     );
